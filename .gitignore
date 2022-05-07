@@ -1,0 +1,9 @@
+**/target/
+**/.bloop/
+/.idea/
+/.bsp/
+/.metals/
+/.vscode/
+**/node_modules/
+yarn.lock
+package-lock.json

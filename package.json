@@ -1,0 +1,27 @@
+{
+  "name": "scala-node-red",
+  "version": "0.1.0",
+  "description": "A Scala.js library for writing custom Node-RED nodes in Scala.",
+  "main": "index.js",
+  "keywords": [
+    "node-red",
+    "scala-js"
+  ],
+  "repository": {
+    "url": "https://github.com/nightscape/scala-node-red",
+    "type": "git"
+  },
+  "node-red": {
+    "nodes": {
+    }
+  },
+  "author": "nightscape",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^12.20.16",
+    "@types/node-red": "^1.1.1",
+    "@types/node-red-node-test-helper": "^0.2.2",
+    "node-red": "^1.3.5",
+    "node-red-node-test-helper": "^0.2.6"
+  }
+}
