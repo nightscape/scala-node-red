@@ -2,6 +2,14 @@ import Dependencies._
 import org.scalajs.jsenv.nodejs.NodeJSEnv.Config
 
 ThisBuild / scalaVersion := "3.1.3-RC2"
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.graalvm("17"))
+ThisBuild / tlBaseVersion := "0.1" // your current series x.y
+
+ThisBuild / organization := "io.github.nightscape"
+ThisBuild / organizationName := "Martin Mauch (@nightscape)"
+ThisBuild / licenses := Seq(License.Apache2)
+ThisBuild / developers := List(tlGitHubDev("nightscape", "Martin Mauch"))
+ThisBuild / tlSonatypeUseLegacyHost := false
 
 val commonSettings = Seq(
   useYarn := true,
