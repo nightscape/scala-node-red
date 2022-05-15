@@ -12,7 +12,7 @@ ThisBuild / developers := List(tlGitHubDev("nightscape", "Martin Mauch"))
 ThisBuild / tlSonatypeUseLegacyHost := false
 
 val commonSettings = Seq(
-  useYarn := true,
+  useYarn := false,
   scalaJSLinkerConfig ~= {
     _.withModuleKind(ModuleKind.CommonJSModule)
   },
