@@ -10,6 +10,7 @@ ThisBuild / organizationName := "Martin Mauch (@nightscape)"
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(tlGitHubDev("nightscape", "Martin Mauch"))
 ThisBuild / tlSonatypeUseLegacyHost := false
+Global / stRemoteCache := RemoteCache.S3Aws(bucket = "scala-node-red", region = "us-east-2", prefix = Some("st-cache"))
 
 val commonSettings = Seq(
   useYarn := false,
