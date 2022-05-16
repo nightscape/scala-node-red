@@ -35,9 +35,9 @@ package object zio {
           )
       }
 
-  def createZioNode[C <: NodeDef : Tag, I, O, E](nodeName: String, f: ZPipeline[C, E, I, O]) =
+  def createZPipelineNode[C <: NodeDef : Tag, I, O, E](nodeName: String, f: ZPipeline[C, E, I, O]) =
     val creator: js.Function1[NodeAPI[NodeAPISettingsWithData], Unit] = (red: NodeAPI[NodeAPISettingsWithData]) =>
-      class ZioNode(config: C) extends js.Object:
+      class ZPipelineNode(config: C) extends js.Object:
         red.nodes.asInstanceOf[js.Dynamic].createNode(this, config)
         val resultStream = f(this.asInstanceOf[Node[Any]].inputStream[I])
         val sending = resultStream.foreach(payload =>
@@ -45,6 +45,6 @@ package object zio {
         )
         _root_.zio.Runtime.default.unsafeRunAsync(sending.provideLayer(ZLayer.succeed(config)))
 
-      red.nodes.asInstanceOf[js.Dynamic].registerType(nodeName, js.constructorOf[ZioNode])
+      red.nodes.asInstanceOf[js.Dynamic].registerType(nodeName, js.constructorOf[ZPipelineNode])
     creator
 }

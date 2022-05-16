@@ -49,7 +49,7 @@ object ZPipelineNodeSpec extends ZIOSpecDefault:
         ),
       js.Dictionary[Any]("id" -> outNodeId, "type" -> "helper")
     ).map(_.asInstanceOf[TestFlowsItemNodeDef])
-  val functionNode = createZioNode[NodeDef, String, String, Throwable](nodeType, ZPipeline.splitOn(","))
+  val functionNode = createZPipelineNode[NodeDef, String, String, Throwable](nodeType, ZPipeline.splitOn(","))
   override def spec = suite("Node-RED ZIO function")(
     test("should be loaded") {
       ZIO.scoped(for {
