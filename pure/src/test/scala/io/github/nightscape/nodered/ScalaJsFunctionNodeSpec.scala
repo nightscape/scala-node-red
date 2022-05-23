@@ -16,7 +16,7 @@
 
 package io.github.nightscape.nodered
 
-import io.github.nightscape.nodered.zio.inputStream
+import io.github.nightscape.nodered.zio.*
 
 import NodeRedTestHelper._
 import typings.nodeRed.mod.{Node, NodeDef, NodeMessage, NodeMessageInFlow, NodeRedApp}
@@ -31,7 +31,7 @@ import _root_.zio.test.Assertion.*
 import _root_.zio.test.*
 import _root_.zio.test.TestAspect.*
 
-object ScalaJsFunctionNodeSpec extends ZIOSpecDefault:
+object ScalaJsFunctionNodeSpec extends ZIOSpecDefault {
 
   val nodeId = "node-id"
   val outNodeId = "out-node-id"
@@ -55,14 +55,20 @@ object ScalaJsFunctionNodeSpec extends ZIOSpecDefault:
   override def spec = suite("Node-RED Scala-JS function")(
     test("should be loaded") {
       ZIO.scoped(for {
-        _ <- loadNodesAndFlow(js.Array(functionNode), createFlow())
+        _ <- loadNodesAndFlow(
+          js.Array(functionNode).asInstanceOf[typings.nodeRedNodeTestHelper.mod.TestNodeInitializer],
+          createFlow()
+        )
         node <- getNode(nodeId)
         outNode <- getNode(outNodeId)
       } yield assertTrue(node.name == nodeName && node.id == nodeId && outNode.id == outNodeId))
     },
     test("should be applied to messages") {
       ZIO.scoped(for {
-        _ <- loadNodesAndFlow(js.Array(functionNode), createFlow(setTo = Some("payload.value")))
+        _ <- loadNodesAndFlow(
+          js.Array(functionNode).asInstanceOf[typings.nodeRedNodeTestHelper.mod.TestNodeInitializer],
+          createFlow(setTo = Some("payload.value"))
+        )
         node <- getNode(nodeId)
         outNode <- getNode(outNodeId)
         outMsgFork <- outNode.inputStream[String].take(1).runCollect.fork
@@ -72,4 +78,6 @@ object ScalaJsFunctionNodeSpec extends ZIOSpecDefault:
     } @@ timeout(1.seconds)
   )
     .provideSomeLayer[NodeRedTestHelper & _root_.zio.test.Live](NodeRedTestHelper.testServer)
-    .provideSomeLayerShared(NodeRedTestHelper.scalaTestHelper) @@ TestAspect.sequential
+    .provideSomeLayerShared[_root_.zio.test.Live](NodeRedTestHelper.scalaTestHelper) @@ TestAspect.sequential
+
+}

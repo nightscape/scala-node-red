@@ -18,10 +18,8 @@ package io.github.nightscape.nodered
 
 import scala.scalajs.js
 import typings.nodeRed.mod.Node
-import typings.nodeRedNodeTestHelper.anon
 import typings.nodeRedNodeTestHelper.mod
 import typings.nodeRedNodeTestHelper.mod.TestCredentials
-import typings.nodeRedNodeTestHelper.nodeRedNodeTestHelperRequire
 import typings.nodeRedRegistry.nodeRedRegistryStrings.NodeCredentials
 import _root_.zio.*
 
@@ -52,20 +50,20 @@ object NodeRedTestHelper {
 
   private val credentials: TestCredentials[Any] = NodeCredentials.asInstanceOf[TestCredentials[Any]]
   type NodeTestHelper = mod.NodeTestHelper
-  val testServer = ZLayer.fromFunction((t: NodeRedTestHelper) =>
+  val testServer = ZLayer.fromFunction { (t: NodeRedTestHelper) =>
     val th = t.testHelper
     new RunningNodeRedServer {
       def unload: Task[Unit] = ZIO.fromPromiseJS(th.unload())
       def load(testNode: mod.TestNodeInitializer, testFlows: mod.TestFlows): URIO[Scope, Unit] =
         ZIO
-          .acquireRelease(ZIO.async(cb => th.load(testNode, testFlows, credentials, () => cb(ZIO.unit))))(_ =>
-            unload.ignoreLogged
-          )
+          .acquireRelease(
+            ZIO.async[Any, Nothing, Unit](cb => th.load(testNode, testFlows, credentials, () => cb(ZIO.unit)))
+          )(_ => unload.ignoreLogged)
           .ignoreLogged
       def getNode(id: String): UIO[Node[TestCredentials[Any]]] =
         ZIO.succeed(th.getNode(id).asInstanceOf[Node[TestCredentials[Any]]])
     }
-  )
+  }
   val scalaTestHelper: ZLayer[Any, Throwable, NodeRedTestHelper] =
     ZLayer.scoped(for {
       l <- ZIO.attempt(mod.`_to`)

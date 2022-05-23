@@ -1,9 +1,11 @@
 import Dependencies._
 import org.scalajs.jsenv.nodejs.NodeJSEnv.Config
 
-ThisBuild / scalaVersion := "3.1.3-RC2"
+ThisBuild / crossScalaVersions := Seq("2.13.8", "3.1.3-RC2")
+ThisBuild / scalaVersion := crossScalaVersions.value.head
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.graalvm("17"))
 ThisBuild / tlBaseVersion := "0.1" // your current series x.y
+ThisBuild / tlFatalWarningsInCi := false
 
 ThisBuild / organization := "io.github.nightscape"
 ThisBuild / organizationName := "Martin Mauch (@nightscape)"
@@ -17,9 +19,9 @@ val commonSettings = Seq(
   scalaJSLinkerConfig ~= {
     _.withModuleKind(ModuleKind.CommonJSModule)
   },
-  scalacOptions ++= Seq(
-    // "-Yrecursion 10"
-  ),
+  Compile / mainClass := Some("com.xencura.nodered.PetriNetComponent"),
+  stIgnore ++= List("express-serve-static-core"),
+  scalacOptions ++= (if (scalaVersion.value.startsWith("2")) Seq("-Yrecursion", "1000", "-Xsource:3") else Seq()),
   Compile / npmDependencies ++= Seq("node-red" -> "2.2.2", "@types/node-red" -> "1.2.1"),
   testFrameworks += new TestFramework("zio.test.sbt.ZTestFramework")
 )

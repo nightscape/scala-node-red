@@ -31,7 +31,7 @@ import typings.nodeRedRegistry.nodeRedRegistryStrings.{input, NodeCredentials}
 
 import scala.scalajs.js
 
-object ZPipelineNodeSpec extends ZIOSpecDefault:
+object ZPipelineNodeSpec extends ZIOSpecDefault {
   println("In Spec")
   val nodeId = "node-id"
   val outNodeId = "out-node-id"
@@ -53,14 +53,20 @@ object ZPipelineNodeSpec extends ZIOSpecDefault:
   override def spec = suite("Node-RED ZIO function")(
     test("should be loaded") {
       ZIO.scoped(for {
-        _ <- loadNodesAndFlow(js.Array(functionNode), createFlow())
+        _ <- loadNodesAndFlow(
+          js.Array(functionNode).asInstanceOf[typings.nodeRedNodeTestHelper.mod.TestNodeInitializer],
+          createFlow()
+        )
         node <- getNode(nodeId)
         outNode <- getNode(outNodeId)
       } yield assertTrue(node.name == nodeName && node.id == nodeId && outNode.id == outNodeId))
     },
     test("should be applied to messages") {
       ZIO.scoped(for {
-        _ <- loadNodesAndFlow(js.Array(functionNode), createFlow())
+        _ <- loadNodesAndFlow(
+          js.Array(functionNode).asInstanceOf[typings.nodeRedNodeTestHelper.mod.TestNodeInitializer],
+          createFlow()
+        )
         node <- getNode(nodeId)
         outNode <- getNode(outNodeId)
         outMsgFork <- outNode.inputStream[String].take(3).runCollect.fork
@@ -70,4 +76,5 @@ object ZPipelineNodeSpec extends ZIOSpecDefault:
     } @@ timeout(1.seconds)
   )
     .provideSomeLayer[NodeRedTestHelper & _root_.zio.test.Live](NodeRedTestHelper.testServer)
-    .provideSomeLayerShared(NodeRedTestHelper.scalaTestHelper) @@ TestAspect.sequential
+    .provideSomeLayerShared[zio.test.Live](NodeRedTestHelper.scalaTestHelper) @@ TestAspect.sequential
+}
