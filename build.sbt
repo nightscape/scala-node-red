@@ -1,7 +1,7 @@
 import Dependencies._
 import org.scalajs.jsenv.nodejs.NodeJSEnv.Config
 
-ThisBuild / crossScalaVersions := Seq("2.13.8", "3.1.3-RC2")
+ThisBuild / crossScalaVersions := Seq("2.13.8", "3.1.3")
 ThisBuild / scalaVersion := crossScalaVersions.value.head
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.graalvm("17"))
 ThisBuild / tlBaseVersion := "0.1" // your current series x.y
