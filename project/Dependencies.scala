@@ -3,7 +3,7 @@ import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt._
 
 object Dependencies {
-  val zioVersion = "2.0.0-RC6"
+  val zioVersion = "2.0.0"
   val zioCore = Def.setting("dev.zio" %%% "zio" % zioVersion)
   val zioStreams = Def.setting("dev.zio" %%% "zio-streams" % zioVersion)
   val zioTest = Def.setting("dev.zio" %%% "zio-test" % zioVersion)
