@@ -16,18 +16,21 @@
 
 package io.github.nightscape
 
-import scala.scalajs.js, js._
-
+import scala.scalajs.js
+import js.*
 import typings.nodeRed.mod.{Node, NodeAPI, NodeAPISettingsWithData, NodeDef, NodeMessage, NodeMessageInFlow}
-import typings.nodeRedRegistry.mod.NodeConstructor
+import typings.nodeRedRegistry.mod.{NodeConstructor, NodeInitializer}
 import typings.nodeRedRegistry.nodeRedRegistryStrings.input
 
 package object nodered {
-  def createScalaJsFunctionNode[C <: NodeDef, I, O](nodeType: String, f: C => I => O) = {
-    val creator: js.Function1[NodeAPI[NodeAPISettingsWithData], Unit] = { (red: NodeAPI[NodeAPISettingsWithData]) =>
+  def createScalaJsFunctionNode[C <: NodeDef, I, O](
+    nodeType: String,
+    f: C => I => O
+  ): NodeInitializer[NodeAPISettingsWithData] = {
+    val creator: NodeInitializer[NodeAPISettingsWithData] = { (red: NodeAPI[NodeAPISettingsWithData]) =>
       class ScalaJsFunctionNode(config: C) extends js.Object {
         red.nodes.createNode(this.asInstanceOf[Node[js.Object]], config)
-        val fn = f(config)
+        private val fn = f(config)
         this
           .asInstanceOf[Node[Any]]
           .on_input(

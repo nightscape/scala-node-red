@@ -17,7 +17,8 @@
 package io.github.nightscape.nodered
 
 import typings.nodeRed.mod.{Node, NodeAPI, NodeDef, NodeMessageInFlow}
-import typings.nodeRedRegistry.mod, mod.NodeAPISettingsWithData
+import typings.nodeRedRegistry.mod
+import mod.{NodeAPISettingsWithData, NodeInitializer}
 import typings.nodeRedRegistry.nodeRedRegistryStrings.input
 
 import scala.scalajs.js
@@ -26,7 +27,7 @@ import _root_.zio.stream.*
 
 package object zio {
   implicit class RichNode[TCreds](val node: Node[TCreds]) extends AnyVal {
-    def inputStream[I] = ZStream
+    def inputStream[I]: ZStream[Any, Throwable, I] = ZStream
       .async[Any, Throwable, I] { cb =>
         node
           .on_input(
@@ -36,17 +37,21 @@ package object zio {
       }
   }
 
-  def createZPipelineNode[C <: NodeDef : Tag, I, O, E](nodeName: String, f: ZPipeline[C, E, I, O]) = {
-    val creator: js.Function1[mod.NodeAPI[NodeAPISettingsWithData], Unit] = { (red: NodeAPI[NodeAPISettingsWithData]) =>
+  def createZPipelineNode[C <: NodeDef : Tag, I, O, E](
+    nodeName: String,
+    f: ZPipeline[C, E, I, O]
+  ): NodeInitializer[NodeAPISettingsWithData] = {
+    val creator: NodeInitializer[NodeAPISettingsWithData] = { (red: NodeAPI[NodeAPISettingsWithData]) =>
       class ZPipelineNode(config: C) extends js.Object {
         red.nodes.asInstanceOf[js.Dynamic].createNode(this, config)
-        val resultStream = f(this.asInstanceOf[Node[Any]].inputStream[I])
-        val sending = resultStream.foreach(payload =>
+        private val resultStream = f(this.asInstanceOf[Node[Any]].inputStream[I])
+        private val sending = resultStream.foreach(payload =>
           ZIO.attempt(this.asInstanceOf[Node[Any]].send(mod.NodeMessage().setPayload(payload)))
         )
         _root_.zio.Runtime.default.unsafeRunAsync(sending.provideLayer(ZLayer.succeed(config)))
       }
       red.nodes.asInstanceOf[js.Dynamic].registerType(nodeName, js.constructorOf[ZPipelineNode])
+      ()
     }
     creator
   }
