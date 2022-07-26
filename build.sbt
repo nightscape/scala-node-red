@@ -19,7 +19,6 @@ val commonSettings = Seq(
   scalaJSLinkerConfig ~= {
     _.withModuleKind(ModuleKind.CommonJSModule)
   },
-  Compile / mainClass := Some("com.xencura.nodered.PetriNetComponent"),
   stIgnore ++= List("express-serve-static-core"),
   scalacOptions ++= (if (scalaVersion.value.startsWith("2")) Seq("-Yrecursion", "1000", "-Xsource:3") else Seq()),
   Compile / npmDependencies ++= Seq("node-red" -> "2.2.2", "@types/node-red" -> "1.2.1"),
